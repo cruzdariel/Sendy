@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  sendy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sendy-app
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount persistent storage for user datasets and share metadata
+      - ./data/user_datasets:/app/data/user_datasets
+      - ./data/shares:/app/data/shares
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
