@@ -91,9 +91,13 @@ def create_share_link():
                 ui.label('Enter your name (optional):').classes('mt-4')
                 name_input = ui.input(placeholder='e.g., Dariel').classes('w-full')
 
+                ui.label('Display options:').classes('mt-4')
+                show_flight_list_checkbox = ui.checkbox('Show flight details table in shared link', value=True).classes('mt-2')
+
                 def generate_share():
                     try:
                         owner_name = name_input.value.strip() if name_input.value else None
+                        show_flight_list = show_flight_list_checkbox.value
 
                         # Get date range if filtered
                         date_range = None
@@ -105,8 +109,8 @@ def create_share_link():
                                 'end': end_date
                             }
 
-                        # Create share with owner name and date range
-                        share_id = create_share(flights_df, flight_stats, expiry_days=30, owner_name=owner_name, date_range=date_range)
+                        # Create share with owner name, date range, and display options
+                        share_id = create_share(flights_df, flight_stats, expiry_days=30, owner_name=owner_name, date_range=date_range, show_flight_list=show_flight_list)
                         if share_id:
                             share_url = get_share_url(share_id)
                             ui.notify('Share link created!', type='positive')
@@ -189,7 +193,7 @@ def dashboard():
     """Dashboard page - shows flight statistics and visualizations"""
     global dashboard_container
 
-    ui.colors(primary='#3b82f6')
+    ui.colors(primary='#11b1ff')
 
     # Get data from session storage
     flight_stats = session_data.get('flight_stats')
@@ -253,7 +257,7 @@ def dashboard():
 @ui.page('/share/{share_id}')
 def view_shared(share_id: str):
     """View a shared flight dashboard"""
-    ui.colors(primary='#3b82f6')
+    ui.colors(primary='#11b1ff')
 
     # Get share info to check for owner name
     from util.share import get_share_info
@@ -308,7 +312,10 @@ def view_shared(share_id: str):
         ui.label(flight_count_text).classes('text-body1 text-grey')
         ui.separator()
 
-        build_dashboard(shared_stats)
+        # Get show_flight_list preference from share info (default to True for backwards compatibility)
+        show_flight_list = share_info.get('show_flight_list', True) if share_info else True
+
+        build_dashboard(shared_stats, show_flight_list=show_flight_list)
 
 
 # Load airports on startup

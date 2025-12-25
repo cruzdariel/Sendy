@@ -11,7 +11,7 @@ def build_upload_page(on_upload_callback):
     Args:
         on_upload_callback: Function to call when CSV is uploaded
     """
-    ui.colors(primary='#3b82f6')
+    ui.colors(primary='#11b1ff')
 
     with ui.header().classes('items-center justify-between'):
         ui.label('Sendy').classes('text-h4 font-bold')

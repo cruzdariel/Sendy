@@ -105,16 +105,21 @@ def compute_metrics(df: pd.DataFrame):
     """Analyze flight data and calculate statistics"""
     stats = {}
 
-    # Total flights
-    stats['total_flights'] = len(df)
+    # Count cancelled flights (Canceled column is "TRUE" or "FALSE" as string)
+    cancelled_mask = df['Canceled'].astype(str).str.upper() == 'TRUE'
+    stats['cancelled_flights'] = int(cancelled_mask.sum())
 
-    # Parse datetime columns
-    df['Takeoff_Actual'] = df['Take off (Actual)'].apply(parse_datetime)
-    df['Landing_Actual'] = df['Landing (Actual)'].apply(parse_datetime)
-    df['Gate_Departure_Scheduled'] = df['Gate Departure (Scheduled)'].apply(parse_datetime)
-    df['Gate_Departure_Actual'] = df['Gate Departure (Actual)'].apply(parse_datetime)
-    df['Gate_Arrival_Scheduled'] = df['Gate Arrival (Scheduled)'].apply(parse_datetime)
-    df['Gate_Arrival_Actual'] = df['Gate Arrival (Actual)'].apply(parse_datetime)
+    # Total flights (excluding cancelled)
+    df_active = df[~cancelled_mask].copy()
+    stats['total_flights'] = len(df_active)
+
+    # Parse datetime columns (use df_active for metrics)
+    df_active['Takeoff_Actual'] = df_active['Take off (Actual)'].apply(parse_datetime)
+    df_active['Landing_Actual'] = df_active['Landing (Actual)'].apply(parse_datetime)
+    df_active['Gate_Departure_Scheduled'] = df_active['Gate Departure (Scheduled)'].apply(parse_datetime)
+    df_active['Gate_Departure_Actual'] = df_active['Gate Departure (Actual)'].apply(parse_datetime)
+    df_active['Gate_Arrival_Scheduled'] = df_active['Gate Arrival (Scheduled)'].apply(parse_datetime)
+    df_active['Gate_Arrival_Actual'] = df_active['Gate Arrival (Actual)'].apply(parse_datetime)
 
     # Calculate distances and flight times
     total_distance = 0
@@ -122,7 +127,7 @@ def compute_metrics(df: pd.DataFrame):
     total_delay = 0
     routes = []
 
-    for _, row in df.iterrows():
+    for _, row in df_active.iterrows():
         # Get coordinates
         from_lat, from_lon = get_airport_coords(row['From'])
         to_lat, to_lon = get_airport_coords(row['To'])
@@ -147,27 +152,27 @@ def compute_metrics(df: pd.DataFrame):
 
     # Unique airports
     airports_visited = set()
-    for airport in df['From'].dropna():
+    for airport in df_active['From'].dropna():
         airports_visited.add(airport)
-    for airport in df['To'].dropna():
+    for airport in df_active['To'].dropna():
         airports_visited.add(airport)
     stats['airports_visited'] = sorted(list(airports_visited))
     stats['total_airports'] = len(airports_visited)
 
     # Airlines
-    airlines = df['Airline'].dropna().value_counts()
+    airlines = df_active['Airline'].dropna().value_counts()
     stats['airlines'] = airlines.to_dict()
     stats['total_airlines'] = len(airlines)
     stats['top_airline'] = airlines.index[0] if len(airlines) > 0 else 'N/A'
 
     # Aircraft types
-    aircraft = df['Aircraft Type Name'].dropna().value_counts()
+    aircraft = df_active['Aircraft Type Name'].dropna().value_counts()
     stats['aircraft_types'] = aircraft.to_dict()
     stats['most_flown_aircraft'] = aircraft.index[0] if len(aircraft) > 0 else 'N/A'
 
     # Top routes
     route_counts = Counter()
-    for _, row in df.iterrows():
+    for _, row in df_active.iterrows():
         if not pd.isna(row['From']) and not pd.isna(row['To']):
             route = f"{row['From']} → {row['To']}"
             route_counts[route] += 1
@@ -182,8 +187,8 @@ def compute_metrics(df: pd.DataFrame):
     stats['countries'] = sorted(list(countries))
     stats['total_countries'] = len(countries)
 
-    # Store routes for map
+    # Store routes for map and flight data for table (active flights only)
     stats['routes'] = routes
-    stats['flights_data'] = df
+    stats['flights_data'] = df_active
 
     return stats

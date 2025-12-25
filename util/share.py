@@ -26,7 +26,7 @@ def generate_share_id(length: int = 8) -> str:
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 
-def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = None, date_range: dict = None) -> str:
+def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = None, date_range: dict = None, show_flight_list: bool = True) -> str:
     """
     Create a shareable link for a flight dataset.
 
@@ -36,6 +36,7 @@ def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = Non
         expiry_days: Number of days until the share expires (default: 30)
         owner_name: Name of the person sharing (optional)
         date_range: Dictionary with 'start' and 'end' date strings (optional)
+        show_flight_list: Whether to show the flight details table in shared view (default: True)
 
     Returns:
         str: Share ID that can be used to access the dataset
@@ -58,7 +59,8 @@ def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = Non
         'total_flights': len(flights_df),
         'is_active': True,
         'owner_name': owner_name if owner_name else None,
-        'date_range': date_range if date_range else None
+        'date_range': date_range if date_range else None,
+        'show_flight_list': show_flight_list
     }
 
     # Save share metadata
