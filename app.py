@@ -260,6 +260,12 @@ def view_shared(share_id: str):
     share_info = get_share_info(share_id)
     owner_name = share_info.get('owner_name') if share_info else None
 
+    # Set page title based on owner name
+    if owner_name:
+        ui.page_title(f"{owner_name}'s Flights from Sendy")
+    else:
+        ui.page_title("Shared Flights from Sendy")
+
     with ui.header().classes('items-center justify-between'):
         ui.label('Sendy').classes('text-h4 font-bold')
         ui.button('Create Your Own', icon='home', on_click=lambda: ui.navigate.to('/')).props('flat text-color=white')
