@@ -5,7 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
-
+data/shares/*
+!data/shares/.gitkeep
+data/user_datasets/*
+!data/user_datasets/.gitkeep
 # Distribution / packaging
 .Python
 build/
