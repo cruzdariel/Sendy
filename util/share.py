@@ -121,7 +121,7 @@ def load_shared_dataset(share_id: str) -> tuple:
     return load_dataset(share_id)
 
 
-def get_share_url(share_id: str, base_url: str = 'http://localhost:8080') -> str:
+def get_share_url(share_id: str, base_url: str = 'https://sendy.dariel.us/') -> str:
     """
     Generate a shareable URL for a share ID.
 

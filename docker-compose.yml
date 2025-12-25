@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: sendy-app
     ports:
-      - "8080:8080"
+      - "8095:8080"
     volumes:
       # Mount persistent storage for user datasets and share metadata
       - ./data/user_datasets:/app/data/user_datasets
