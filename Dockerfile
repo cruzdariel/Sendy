@@ -20,6 +20,7 @@ COPY pages/ ./pages/
 COPY util/ ./util/
 COPY ui_components/ ./ui_components/
 COPY data/ ./data/
+COPY static/ ./static/
 
 # Create directory for persistent storage
 RUN mkdir -p data/user_datasets
