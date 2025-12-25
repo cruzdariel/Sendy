@@ -12,6 +12,20 @@ from pages.upload import build_upload_page
 session_data = {}
 dashboard_container = None
 
+app.add_static_files('/static', 'static')
+
+ui.add_head_html("""
+<meta property="og:title" content="Sendy">
+<meta property="og:description" content="An indie tool to share your Flighty stats with friends and family.">
+<meta property="og:image" content="https://sendy.dariel.us/cover.png">
+<meta property="og:url" content="https://sendy.dariel.us">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sendy">
+<meta name="twitter:description" content="An indie tool to share your Flighty stats with friends and family.">
+<meta name="twitter:image" content="https://sendy.dariel.us/cover.png">
+""", shared=True)
 
 def update_dashboard_view():
     """Update dashboard with filtered data based on date range"""
@@ -182,7 +196,7 @@ def dashboard():
     flights_df = session_data.get('flights_df_original')
 
     with ui.header().classes('items-center justify-between'):
-        ui.label('Sendy').classes('text-h4')
+        ui.label('Sendy').classes('text-h4 font-bold')
         with ui.row().classes('gap-2'):
             ui.button('Upload New', icon='upload', on_click=lambda: ui.navigate.to('/')).props('flat text-color=white')
             ui.button('Share', icon='share', on_click=create_share_link).props('flat text-color=white')
@@ -246,10 +260,8 @@ def view_shared(share_id: str):
     share_info = get_share_info(share_id)
     owner_name = share_info.get('owner_name') if share_info else None
 
-    header_title = f"Sendy"
-
     with ui.header().classes('items-center justify-between'):
-        ui.label(header_title).classes('text-h4')
+        ui.label('Sendy').classes('text-h4 font-bold')
         ui.button('Create Your Own', icon='home', on_click=lambda: ui.navigate.to('/')).props('flat text-color=white')
 
     with ui.column().classes('w-full p-4'):
@@ -297,4 +309,4 @@ def view_shared(share_id: str):
 load_airports()
 
 
-ui.run(title='Sendy', port=8080)
+ui.run(title='Sendy', port=8080, favicon="static/favicon.png")

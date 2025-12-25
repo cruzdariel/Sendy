@@ -29,17 +29,18 @@ def build_dashboard(stats):
     ui.separator()
     ui.label('Top Airlines').classes('text-h5 mt-4')
 
-    with ui.row().classes('w-full gap-4'):
-        # Top airlines chart
+    with ui.row().classes('w-full gap-4 flex-wrap'):
         airlines = stats.get('airlines', {})
         if airlines:
             airline_data = dict(list(airlines.items())[:10])
-            chart_card('Top 10 Airlines', airline_data)
+            with ui.element().classes('w-full md:flex-1'):
+                chart_card('Top 10 Airlines', airline_data)
 
         # Top routes chart
         routes = stats.get('top_routes', {})
         if routes:
-            chart_card('Top 10 Routes', routes)
+            with ui.element().classes('w-full md:flex-1'):
+                chart_card('Top 10 Routes', routes)
 
     # Aircraft types chart
     ui.label('Top Aircraft Types').classes('text-h5 mt-4')
