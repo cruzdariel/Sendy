@@ -73,7 +73,7 @@ def build_dashboard(stats):
                     'bottom': '20%',
                     'containLabel': True
                 }
-            }).classes('w-full').style('min-height: 400px')
+            }).classes('w-full').style('min-heiught: 400px')
 
     # Flight map
     ui.label('Flight Map').classes('text-h5 mt-4')
