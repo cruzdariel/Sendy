@@ -15,14 +15,14 @@ dashboard_container = None
 app.add_static_files('/static', 'static')
 
 ui.add_head_html("""
-<meta property="og:title" content="Sendy">
+<meta property="og:title" content="Sendy for Flighty stats sharing">
 <meta property="og:description" content="An indie tool to share your Flighty stats with friends and family.">
 <meta property="og:image" content="https://sendy.dariel.us/static/cover.png">
 <meta property="og:url" content="https://sendy.dariel.us">
 <meta property="og:type" content="website">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sendy">
+<meta name="twitter:title" content="Sendy for Flighty stats sharing">
 <meta name="twitter:description" content="An indie tool to share your Flighty stats with friends and family.">
 <meta name="twitter:image" content="https://sendy.dariel.us/static/cover.png">
 """, shared=True)

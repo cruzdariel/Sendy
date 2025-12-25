@@ -4,7 +4,7 @@ import string
 import json
 from pathlib import Path
 from datetime import datetime, timedelta
-from util.storage import save_dataset, load_dataset, dataset_exists
+from util.storage import save_dataset, load_dataset, dataset_exists, delete_dataset
 
 
 # Storage directory for share mappings
@@ -26,6 +26,47 @@ def generate_share_id(length: int = 8) -> str:
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 
+def cleanup_expired_shares() -> int:
+    """
+    Delete all expired shares and their associated datasets.
+
+    Returns:
+        int: Number of shares deleted
+    """
+    deleted_count = 0
+    try:
+        for share_file in SHARE_DIR.glob('*.json'):
+            try:
+                with open(share_file, 'r') as f:
+                    metadata = json.load(f)
+
+                # Check if share is expired
+                expires_at = datetime.fromisoformat(metadata['expires_at'])
+                if datetime.now() > expires_at:
+                    share_id = metadata['share_id']
+
+                    # Delete the dataset
+                    if delete_dataset(share_id):
+                        # Delete the share metadata file
+                        share_file.unlink()
+                        print(f"Deleted expired share: {share_id}")
+                        deleted_count += 1
+                    else:
+                        print(f"Failed to delete dataset for expired share: {share_id}")
+
+            except Exception as e:
+                print(f"Error processing share file {share_file.name}: {e}")
+                continue
+
+    except Exception as e:
+        print(f"Error during cleanup: {e}")
+
+    if deleted_count > 0:
+        print(f"Cleanup complete: {deleted_count} expired share(s) deleted")
+
+    return deleted_count
+
+
 def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = None, date_range: dict = None, show_flight_list: bool = True) -> str:
     """
     Create a shareable link for a flight dataset.
@@ -41,6 +82,9 @@ def create_share(flights_df, stats, expiry_days: int = 30, owner_name: str = Non
     Returns:
         str: Share ID that can be used to access the dataset
     """
+    # Clean up expired shares before creating a new one
+    cleanup_expired_shares()
+
     # Generate unique share ID
     share_id = generate_share_id()
     while share_exists(share_id):
